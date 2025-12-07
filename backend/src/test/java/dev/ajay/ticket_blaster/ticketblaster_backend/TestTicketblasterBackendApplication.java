@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 public class TestTicketblasterBackendApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.from(TicketblasterBackendApplication::main).run(args);
+		SpringApplication.from(TicketblasterBackendApplication::main).with(TestcontainersConfiguration.class).run(args);
 	}
 
 }
