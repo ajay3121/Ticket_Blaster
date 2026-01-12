@@ -14,9 +14,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,16 +23,27 @@ public class BookingService {
     private final SeatRepository seatRepository;
     private final BookingRepository bookingRepository;
     private final BookingSeatRepository bookingSeatRepository;
+    private final SeatLockService seatLockService; // <--- 1. Inject this
 
     @Transactional
     public BookingResponseDto bookSeat(BookingRequestDto request) {
-        try{
+
+        // 2. The Redis Guard (Fast Fail)
+        // We try to acquire a lock. If we can't, someone else is processing this seat.
+        boolean acquired = seatLockService.acquireLock(request.getSeatId(), request.getUserId());
+
+        if (!acquired) {
+            // Redis says NO. We don't even bother the Database.
+            throw new IllegalStateException("Seat is currently selected by another user.");
+        }
+
+        try {
+            // ... Your Existing DB Logic ...
             Seat seat = seatRepository.findById(request.getSeatId())
                     .orElseThrow(() -> new NoSuchElementException("Seat not found"));
 
-            // 2. Strict Availability Check
             if (seat.getSeatStatus() != SeatStatus.AVAILABLE) {
-                throw new RuntimeException("Seat is already booked!");
+                throw new IllegalStateException("Seat is already booked!");
             }
 
             // 3. Lock the Seat (Update Status)
@@ -58,17 +67,19 @@ public class BookingService {
                     .priceSnapshot(seat.getSeatType().getPrice()) // Lock the price at moment of purchase
                     .build();
 
-            bookingSeatRepository.save(bookingSeat); // You might need to inject this repo
+            bookingSeatRepository.save(bookingSeat);
 
-            // 6. Return Success Response
             return BookingResponseDto.builder()
                     .bookingId(booking.getId())
                     .status("CONFIRMED")
                     .amount(booking.getTotalAmount())
                     .build();
-        } catch (org.springframework.orm.ObjectOptimisticLockingFailureException e){
-            throw new IllegalStateException("Too late! Someone just booked this seat.");
-        }
 
+        } finally {
+            // 3. Cleanup
+            // Since this is "Instant Book", we release the lock immediately after
+            // the DB transaction finishes (success or fail).
+            seatLockService.releaseLock(request.getSeatId());
+        }
     }
 }

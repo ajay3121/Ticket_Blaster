@@ -3,6 +3,7 @@ package dev.ajay.ticket_blaster.ticketblaster_backend.models;
 import dev.ajay.ticket_blaster.ticketblaster_backend.enums.BookingStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -30,6 +31,7 @@ public class Booking {
     @Enumerated(EnumType.STRING)
     private BookingStatus bookingStatus;
 
+    @CreationTimestamp
     private LocalDateTime bookingTime;
 
     private BigDecimal totalAmount;
