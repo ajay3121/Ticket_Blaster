@@ -2,10 +2,7 @@ package dev.ajay.ticket_blaster.ticketblaster_backend.models;
 
 import dev.ajay.ticket_blaster.ticketblaster_backend.enums.SeatName;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -13,6 +10,7 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Getter
 @Setter
 @Table(name = "seat_types")
