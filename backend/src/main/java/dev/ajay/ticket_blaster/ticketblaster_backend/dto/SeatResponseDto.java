@@ -9,9 +9,7 @@ public record SeatResponseDto(
         UUID seatId,
         int row,
         int col,
-        SeatStatus status,
-        String type,
-        BigDecimal price
+        SeatStatus status
 ) {
 
     public static SeatResponseDto fromEntity(Seat seat) {
@@ -19,10 +17,8 @@ public record SeatResponseDto(
                 seat.getId(),
                 seat.getRowNum(),
                 seat.getColNum(),
-                seat.getSeatStatus(),
+                seat.getSeatStatus()
 
-                seat.getSeatType() != null ? seat.getSeatType().getType().name() : "UNKNOWN",
-                seat.getSeatType() != null ? seat.getSeatType().getPrice() : BigDecimal.ZERO
         );
     }
 }

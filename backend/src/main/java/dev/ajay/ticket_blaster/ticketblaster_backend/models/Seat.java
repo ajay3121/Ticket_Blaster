@@ -22,10 +22,6 @@ public class Seat {
     @JoinColumn(name = "screen_id", referencedColumnName = "id")
     private Screen screen;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seat_type_id", referencedColumnName = "id")
-    private SeatType seatType;
-
     private int rowNum;
     private int colNum;
 
