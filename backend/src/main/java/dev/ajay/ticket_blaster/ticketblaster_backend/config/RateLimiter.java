@@ -13,8 +13,8 @@ public class RateLimiter {
     public Bucket bucket() {
       return Bucket.builder()
                 .addLimit(limit -> limit
-                        .capacity(200)
-                        .refillGreedy(200, Duration.ofMinutes(1)))
+                        .capacity(100)
+                        .refillGreedy(50, Duration.ofSeconds(1)))
                 .build();
     }
 }
