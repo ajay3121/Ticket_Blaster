@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class RateLimiterService {
     private final Bucket bucket;
 
-    public boolean allowRequest(){
+    public boolean acquireRedisLock(){
         return bucket.tryConsume(1);
     }
 }
