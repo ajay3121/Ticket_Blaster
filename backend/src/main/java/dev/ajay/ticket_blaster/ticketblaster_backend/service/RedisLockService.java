@@ -37,4 +37,16 @@ public class RedisLockService {
         redisTemplate.execute(releaseScript, Collections.singletonList(key), userId);
     }
 
+    public void markSeatAsSold(String seatId) {
+        // This makes the status permanent
+        redisTemplate.opsForValue().set("seat:" + seatId + ":status", "SOLD", Duration.ofMinutes(1));
+    }
+
+    public boolean isSeatSold(String seatId) {
+        // A fast READ operation.
+        // Returns true ONLY if the specific "SOLD" flag exists.
+        String status = redisTemplate.opsForValue().get("seat:" + seatId + ":status");
+        return "SOLD".equals(status);
+    }
+
 }
